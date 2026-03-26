@@ -1,6 +1,127 @@
 #include <iostream>
 #include <string>
+#include <vector>
 #include "math_utils.h"
+
+
+class Employee {
+protected:
+    std::string name;
+    int id;
+
+public:
+    Employee(std::string n, int i) : name(n), id(i) {}
+
+    virtual ~Employee() {}
+
+    virtual double calculatePay() const = 0;
+    void updateDetails(std::string newName) {
+        name = newName;
+    }
+
+    void updateDetails(std::string newName, int newId) {
+        name = newName;
+        id = newId;
+    }
+
+    virtual void displayInfo() const {
+        std::cout << "Name: " << name << ", ID: " << id;
+    }
+};
+
+class SalariedEmployee : public Employee {
+private:
+    double annualSalary;
+
+public:
+    SalariedEmployee(std::string n, int i, double salary) : Employee(n, i), annualSalary(salary) {}
+
+    double calculatePay() const override {
+        return annualSalary / 12.0;
+    }
+
+    void displayInfo() const override {
+        Employee::displayInfo();
+        std::cout << " | Type: Salaried | Annual Salary: " << annualSalary
+                  << " | Total Pay: " << calculatePay() << "\n";
+    }
+};
+
+class HourlyEmployee : public Employee {
+private:
+    double hourlyRate;
+    double hoursWorked;
+
+public:
+    HourlyEmployee(std::string n, int i, double rate, double hours)
+        : Employee(n, i), hourlyRate(rate), hoursWorked(hours) {}
+
+    double calculatePay() const override {
+        return hourlyRate * hoursWorked;
+    }
+
+    void displayInfo() const override {
+        Employee::displayInfo();
+        std::cout << " | Type: Hourly | Rate: " << hourlyRate << ", Hours: " << hoursWorked
+                  << " | Total Pay: " << calculatePay() << "\n";
+    }
+};
+
+class CommissionEmployee : public Employee {
+private:
+    double baseSalary;
+    double salesAmount;
+    double commissionRate;
+
+public:
+    CommissionEmployee(std::string n, int i, double base, double sales, double rate)
+        : Employee(n, i), baseSalary(base), salesAmount(sales), commissionRate(rate) {}
+
+    double calculatePay() const override {
+        return baseSalary + (salesAmount * commissionRate);
+    }
+
+    void displayInfo() const override {
+        Employee::displayInfo();
+        std::cout << " | Type: Commission | Base: " << baseSalary
+                  << ", Sales: " << salesAmount << ", Rate: " << commissionRate
+                  << " | Total Pay: " << calculatePay() << "\n";
+    }
+};
+
+int Aufgabe4() {
+    std::cout << "\n--- Task 04: Static Polymorphism (Compile-time) ---\n";
+    SalariedEmployee testEmp("Max Mustermann", 100, 60000.0);
+    testEmp.displayInfo();
+
+    testEmp.updateDetails("Max Müller");
+    std::cout << "After updateDetails(string):\n";
+    testEmp.displayInfo();
+
+    testEmp.updateDetails("Maximilian Müller", 999);
+    std::cout << "After updateDetails(string, int):\n";
+    testEmp.displayInfo();
+
+    std::cout << "\n--- Task 04: Dynamic Polymorphism (Runtime) ---\n";
+
+    std::vector<Employee*> fleet;
+    fleet.push_back(new SalariedEmployee("Alice", 101, 72000.0));
+    fleet.push_back(new HourlyEmployee("Bob", 102, 25.50, 160.0));
+    fleet.push_back(new CommissionEmployee("Charlie", 103, 2000.0, 15000.0, 0.10));
+
+    for (Employee* emp : fleet) {
+
+        emp->displayInfo();
+    }
+
+    for (Employee* emp : fleet) {
+        delete emp;
+    }
+    fleet.clear();
+
+    return 0;
+}
+
 
 class Rectangle {
 private:
@@ -219,7 +340,7 @@ int main()
 
     logMessage("Uebung abgeschlossen");
 
-    std::cout << "\n--- Tutorial 1 & 2 Aufgaben ---\n";
+    std::cout << "\n--- Tutorial 1 Aufgaben ---\n";
     Alter();
     std::cout << " \n";
     Aufgabe1a();
@@ -228,6 +349,8 @@ int main()
     std::cout << " \n";
     Aufgabe1c();
     std::cout << " \n";
+
+    std::cout << " \n--- Tutorial 2 Aufgaben ---\n";
     Aufgabe2();
 
     std::cout << "\n--- Tutorial 3 Aufgaben ---\n";
@@ -238,6 +361,8 @@ int main()
     Aufgabe3Part3();
     std::cout << " \n";
     Aufgabe3Part4();
+    std::cout << " \n";
+    Aufgabe4();
 
     return 0;
 }
